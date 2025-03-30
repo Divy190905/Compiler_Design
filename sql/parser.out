@@ -1,0 +1,449 @@
+Created by PLY version 3.11 (http://www.dabeaz.com/ply)
+
+Grammar
+
+Rule 0     S' -> query
+Rule 1     query -> SELECT select_list FROM table where_clause_opt SEMICOLON
+Rule 2     query -> SELECT select_list FROM table where_clause_opt
+Rule 3     select_list -> STAR
+Rule 4     select_list -> column_list
+Rule 5     column_list -> column_list COMMA IDENTIFIER
+Rule 6     column_list -> IDENTIFIER
+Rule 7     table -> IDENTIFIER
+Rule 8     where_clause_opt -> WHERE condition
+Rule 9     where_clause_opt -> empty
+Rule 10    condition -> condition AND condition
+Rule 11    condition -> condition OR condition
+Rule 12    condition -> simple_condition
+Rule 13    simple_condition -> IDENTIFIER EQUALS value
+Rule 14    simple_condition -> IDENTIFIER GREATER value
+Rule 15    simple_condition -> IDENTIFIER LESS value
+Rule 16    simple_condition -> IDENTIFIER GREATEREQUAL value
+Rule 17    simple_condition -> IDENTIFIER LESSEQUAL value
+Rule 18    value -> NUMBER
+Rule 19    value -> STRING
+Rule 20    empty -> <empty>
+
+Terminals, with rules where they appear
+
+AND                  : 10
+COMMA                : 5
+EQUALS               : 13
+FROM                 : 1 2
+GREATER              : 14
+GREATEREQUAL         : 16
+IDENTIFIER           : 5 6 7 13 14 15 16 17
+LESS                 : 15
+LESSEQUAL            : 17
+NUMBER               : 18
+OR                   : 11
+SELECT               : 1 2
+SEMICOLON            : 1
+STAR                 : 3
+STRING               : 19
+WHERE                : 8
+error                : 
+
+Nonterminals, with rules where they appear
+
+column_list          : 4 5
+condition            : 8 10 10 11 11
+empty                : 9
+query                : 0
+select_list          : 1 2
+simple_condition     : 12
+table                : 1 2
+value                : 13 14 15 16 17
+where_clause_opt     : 1 2
+
+Parsing method: LALR
+
+state 0
+
+    (0) S' -> . query
+    (1) query -> . SELECT select_list FROM table where_clause_opt SEMICOLON
+    (2) query -> . SELECT select_list FROM table where_clause_opt
+
+    SELECT          shift and go to state 2
+
+    query                          shift and go to state 1
+
+state 1
+
+    (0) S' -> query .
+
+
+
+state 2
+
+    (1) query -> SELECT . select_list FROM table where_clause_opt SEMICOLON
+    (2) query -> SELECT . select_list FROM table where_clause_opt
+    (3) select_list -> . STAR
+    (4) select_list -> . column_list
+    (5) column_list -> . column_list COMMA IDENTIFIER
+    (6) column_list -> . IDENTIFIER
+
+    STAR            shift and go to state 4
+    IDENTIFIER      shift and go to state 6
+
+    select_list                    shift and go to state 3
+    column_list                    shift and go to state 5
+
+state 3
+
+    (1) query -> SELECT select_list . FROM table where_clause_opt SEMICOLON
+    (2) query -> SELECT select_list . FROM table where_clause_opt
+
+    FROM            shift and go to state 7
+
+
+state 4
+
+    (3) select_list -> STAR .
+
+    FROM            reduce using rule 3 (select_list -> STAR .)
+
+
+state 5
+
+    (4) select_list -> column_list .
+    (5) column_list -> column_list . COMMA IDENTIFIER
+
+    FROM            reduce using rule 4 (select_list -> column_list .)
+    COMMA           shift and go to state 8
+
+
+state 6
+
+    (6) column_list -> IDENTIFIER .
+
+    COMMA           reduce using rule 6 (column_list -> IDENTIFIER .)
+    FROM            reduce using rule 6 (column_list -> IDENTIFIER .)
+
+
+state 7
+
+    (1) query -> SELECT select_list FROM . table where_clause_opt SEMICOLON
+    (2) query -> SELECT select_list FROM . table where_clause_opt
+    (7) table -> . IDENTIFIER
+
+    IDENTIFIER      shift and go to state 10
+
+    table                          shift and go to state 9
+
+state 8
+
+    (5) column_list -> column_list COMMA . IDENTIFIER
+
+    IDENTIFIER      shift and go to state 11
+
+
+state 9
+
+    (1) query -> SELECT select_list FROM table . where_clause_opt SEMICOLON
+    (2) query -> SELECT select_list FROM table . where_clause_opt
+    (8) where_clause_opt -> . WHERE condition
+    (9) where_clause_opt -> . empty
+    (20) empty -> .
+
+    WHERE           shift and go to state 13
+    SEMICOLON       reduce using rule 20 (empty -> .)
+    $end            reduce using rule 20 (empty -> .)
+
+    where_clause_opt               shift and go to state 12
+    empty                          shift and go to state 14
+
+state 10
+
+    (7) table -> IDENTIFIER .
+
+    WHERE           reduce using rule 7 (table -> IDENTIFIER .)
+    SEMICOLON       reduce using rule 7 (table -> IDENTIFIER .)
+    $end            reduce using rule 7 (table -> IDENTIFIER .)
+
+
+state 11
+
+    (5) column_list -> column_list COMMA IDENTIFIER .
+
+    COMMA           reduce using rule 5 (column_list -> column_list COMMA IDENTIFIER .)
+    FROM            reduce using rule 5 (column_list -> column_list COMMA IDENTIFIER .)
+
+
+state 12
+
+    (1) query -> SELECT select_list FROM table where_clause_opt . SEMICOLON
+    (2) query -> SELECT select_list FROM table where_clause_opt .
+
+    SEMICOLON       shift and go to state 15
+    $end            reduce using rule 2 (query -> SELECT select_list FROM table where_clause_opt .)
+
+
+state 13
+
+    (8) where_clause_opt -> WHERE . condition
+    (10) condition -> . condition AND condition
+    (11) condition -> . condition OR condition
+    (12) condition -> . simple_condition
+    (13) simple_condition -> . IDENTIFIER EQUALS value
+    (14) simple_condition -> . IDENTIFIER GREATER value
+    (15) simple_condition -> . IDENTIFIER LESS value
+    (16) simple_condition -> . IDENTIFIER GREATEREQUAL value
+    (17) simple_condition -> . IDENTIFIER LESSEQUAL value
+
+    IDENTIFIER      shift and go to state 18
+
+    condition                      shift and go to state 16
+    simple_condition               shift and go to state 17
+
+state 14
+
+    (9) where_clause_opt -> empty .
+
+    SEMICOLON       reduce using rule 9 (where_clause_opt -> empty .)
+    $end            reduce using rule 9 (where_clause_opt -> empty .)
+
+
+state 15
+
+    (1) query -> SELECT select_list FROM table where_clause_opt SEMICOLON .
+
+    $end            reduce using rule 1 (query -> SELECT select_list FROM table where_clause_opt SEMICOLON .)
+
+
+state 16
+
+    (8) where_clause_opt -> WHERE condition .
+    (10) condition -> condition . AND condition
+    (11) condition -> condition . OR condition
+
+    SEMICOLON       reduce using rule 8 (where_clause_opt -> WHERE condition .)
+    $end            reduce using rule 8 (where_clause_opt -> WHERE condition .)
+    AND             shift and go to state 19
+    OR              shift and go to state 20
+
+
+state 17
+
+    (12) condition -> simple_condition .
+
+    AND             reduce using rule 12 (condition -> simple_condition .)
+    OR              reduce using rule 12 (condition -> simple_condition .)
+    SEMICOLON       reduce using rule 12 (condition -> simple_condition .)
+    $end            reduce using rule 12 (condition -> simple_condition .)
+
+
+state 18
+
+    (13) simple_condition -> IDENTIFIER . EQUALS value
+    (14) simple_condition -> IDENTIFIER . GREATER value
+    (15) simple_condition -> IDENTIFIER . LESS value
+    (16) simple_condition -> IDENTIFIER . GREATEREQUAL value
+    (17) simple_condition -> IDENTIFIER . LESSEQUAL value
+
+    EQUALS          shift and go to state 21
+    GREATER         shift and go to state 22
+    LESS            shift and go to state 23
+    GREATEREQUAL    shift and go to state 24
+    LESSEQUAL       shift and go to state 25
+
+
+state 19
+
+    (10) condition -> condition AND . condition
+    (10) condition -> . condition AND condition
+    (11) condition -> . condition OR condition
+    (12) condition -> . simple_condition
+    (13) simple_condition -> . IDENTIFIER EQUALS value
+    (14) simple_condition -> . IDENTIFIER GREATER value
+    (15) simple_condition -> . IDENTIFIER LESS value
+    (16) simple_condition -> . IDENTIFIER GREATEREQUAL value
+    (17) simple_condition -> . IDENTIFIER LESSEQUAL value
+
+    IDENTIFIER      shift and go to state 18
+
+    condition                      shift and go to state 26
+    simple_condition               shift and go to state 17
+
+state 20
+
+    (11) condition -> condition OR . condition
+    (10) condition -> . condition AND condition
+    (11) condition -> . condition OR condition
+    (12) condition -> . simple_condition
+    (13) simple_condition -> . IDENTIFIER EQUALS value
+    (14) simple_condition -> . IDENTIFIER GREATER value
+    (15) simple_condition -> . IDENTIFIER LESS value
+    (16) simple_condition -> . IDENTIFIER GREATEREQUAL value
+    (17) simple_condition -> . IDENTIFIER LESSEQUAL value
+
+    IDENTIFIER      shift and go to state 18
+
+    condition                      shift and go to state 27
+    simple_condition               shift and go to state 17
+
+state 21
+
+    (13) simple_condition -> IDENTIFIER EQUALS . value
+    (18) value -> . NUMBER
+    (19) value -> . STRING
+
+    NUMBER          shift and go to state 29
+    STRING          shift and go to state 30
+
+    value                          shift and go to state 28
+
+state 22
+
+    (14) simple_condition -> IDENTIFIER GREATER . value
+    (18) value -> . NUMBER
+    (19) value -> . STRING
+
+    NUMBER          shift and go to state 29
+    STRING          shift and go to state 30
+
+    value                          shift and go to state 31
+
+state 23
+
+    (15) simple_condition -> IDENTIFIER LESS . value
+    (18) value -> . NUMBER
+    (19) value -> . STRING
+
+    NUMBER          shift and go to state 29
+    STRING          shift and go to state 30
+
+    value                          shift and go to state 32
+
+state 24
+
+    (16) simple_condition -> IDENTIFIER GREATEREQUAL . value
+    (18) value -> . NUMBER
+    (19) value -> . STRING
+
+    NUMBER          shift and go to state 29
+    STRING          shift and go to state 30
+
+    value                          shift and go to state 33
+
+state 25
+
+    (17) simple_condition -> IDENTIFIER LESSEQUAL . value
+    (18) value -> . NUMBER
+    (19) value -> . STRING
+
+    NUMBER          shift and go to state 29
+    STRING          shift and go to state 30
+
+    value                          shift and go to state 34
+
+state 26
+
+    (10) condition -> condition AND condition .
+    (10) condition -> condition . AND condition
+    (11) condition -> condition . OR condition
+
+  ! shift/reduce conflict for AND resolved as shift
+  ! shift/reduce conflict for OR resolved as shift
+    SEMICOLON       reduce using rule 10 (condition -> condition AND condition .)
+    $end            reduce using rule 10 (condition -> condition AND condition .)
+    AND             shift and go to state 19
+    OR              shift and go to state 20
+
+  ! AND             [ reduce using rule 10 (condition -> condition AND condition .) ]
+  ! OR              [ reduce using rule 10 (condition -> condition AND condition .) ]
+
+
+state 27
+
+    (11) condition -> condition OR condition .
+    (10) condition -> condition . AND condition
+    (11) condition -> condition . OR condition
+
+  ! shift/reduce conflict for AND resolved as shift
+  ! shift/reduce conflict for OR resolved as shift
+    SEMICOLON       reduce using rule 11 (condition -> condition OR condition .)
+    $end            reduce using rule 11 (condition -> condition OR condition .)
+    AND             shift and go to state 19
+    OR              shift and go to state 20
+
+  ! AND             [ reduce using rule 11 (condition -> condition OR condition .) ]
+  ! OR              [ reduce using rule 11 (condition -> condition OR condition .) ]
+
+
+state 28
+
+    (13) simple_condition -> IDENTIFIER EQUALS value .
+
+    AND             reduce using rule 13 (simple_condition -> IDENTIFIER EQUALS value .)
+    OR              reduce using rule 13 (simple_condition -> IDENTIFIER EQUALS value .)
+    SEMICOLON       reduce using rule 13 (simple_condition -> IDENTIFIER EQUALS value .)
+    $end            reduce using rule 13 (simple_condition -> IDENTIFIER EQUALS value .)
+
+
+state 29
+
+    (18) value -> NUMBER .
+
+    AND             reduce using rule 18 (value -> NUMBER .)
+    OR              reduce using rule 18 (value -> NUMBER .)
+    SEMICOLON       reduce using rule 18 (value -> NUMBER .)
+    $end            reduce using rule 18 (value -> NUMBER .)
+
+
+state 30
+
+    (19) value -> STRING .
+
+    AND             reduce using rule 19 (value -> STRING .)
+    OR              reduce using rule 19 (value -> STRING .)
+    SEMICOLON       reduce using rule 19 (value -> STRING .)
+    $end            reduce using rule 19 (value -> STRING .)
+
+
+state 31
+
+    (14) simple_condition -> IDENTIFIER GREATER value .
+
+    AND             reduce using rule 14 (simple_condition -> IDENTIFIER GREATER value .)
+    OR              reduce using rule 14 (simple_condition -> IDENTIFIER GREATER value .)
+    SEMICOLON       reduce using rule 14 (simple_condition -> IDENTIFIER GREATER value .)
+    $end            reduce using rule 14 (simple_condition -> IDENTIFIER GREATER value .)
+
+
+state 32
+
+    (15) simple_condition -> IDENTIFIER LESS value .
+
+    AND             reduce using rule 15 (simple_condition -> IDENTIFIER LESS value .)
+    OR              reduce using rule 15 (simple_condition -> IDENTIFIER LESS value .)
+    SEMICOLON       reduce using rule 15 (simple_condition -> IDENTIFIER LESS value .)
+    $end            reduce using rule 15 (simple_condition -> IDENTIFIER LESS value .)
+
+
+state 33
+
+    (16) simple_condition -> IDENTIFIER GREATEREQUAL value .
+
+    AND             reduce using rule 16 (simple_condition -> IDENTIFIER GREATEREQUAL value .)
+    OR              reduce using rule 16 (simple_condition -> IDENTIFIER GREATEREQUAL value .)
+    SEMICOLON       reduce using rule 16 (simple_condition -> IDENTIFIER GREATEREQUAL value .)
+    $end            reduce using rule 16 (simple_condition -> IDENTIFIER GREATEREQUAL value .)
+
+
+state 34
+
+    (17) simple_condition -> IDENTIFIER LESSEQUAL value .
+
+    AND             reduce using rule 17 (simple_condition -> IDENTIFIER LESSEQUAL value .)
+    OR              reduce using rule 17 (simple_condition -> IDENTIFIER LESSEQUAL value .)
+    SEMICOLON       reduce using rule 17 (simple_condition -> IDENTIFIER LESSEQUAL value .)
+    $end            reduce using rule 17 (simple_condition -> IDENTIFIER LESSEQUAL value .)
+
+WARNING: 
+WARNING: Conflicts:
+WARNING: 
+WARNING: shift/reduce conflict for AND in state 26 resolved as shift
+WARNING: shift/reduce conflict for OR in state 26 resolved as shift
+WARNING: shift/reduce conflict for AND in state 27 resolved as shift
+WARNING: shift/reduce conflict for OR in state 27 resolved as shift
