@@ -58,5 +58,3 @@ Refer to the SQL parser script for usage instructions.
    python3 <script_name>.py
    ```
 
-## License
-This project is for educational purposes and is licensed under the MIT License.
