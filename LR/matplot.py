@@ -143,6 +143,74 @@ def format_action(action):
     
     return str(action)
 
+def visualize_parsing_steps(parsing_steps, output_file=None):
+    """
+    Create a visual representation of LR parsing steps.
+    
+    Args:
+        parsing_steps (list): List of dictionaries containing stack, input, and action for each step
+        output_file (str, optional): If provided, save the visualization to this file
+    """
+    try:
+        # Create a DataFrame for the parsing steps
+        data = {
+            'Step': [f"Step {i}" for i in range(len(parsing_steps))],
+            'Stack': [step['stack'] for step in parsing_steps],
+            'Input': [step['input'] for step in parsing_steps],
+            'Action': [step['action'] for step in parsing_steps]
+        }
+        df = pd.DataFrame(data)
+        
+        # Create figure and axes with appropriate dimensions
+        fig_height = max(8, len(parsing_steps) * 0.5)
+        fig, ax = plt.subplots(figsize=(12, fig_height))
+        
+        # Hide axes
+        ax.axis('off')
+        
+        # Create table
+        table = ax.table(
+            cellText=df.values,
+            colLabels=df.columns,
+            loc='center',
+            cellLoc='center',
+            colColours=['#f2f2f2']*4,
+            colWidths=[0.1, 0.3, 0.3, 0.3]
+        )
+        
+        # Style the table
+        table.auto_set_font_size(False)
+        table.set_fontsize(12)
+        table.scale(1, 1.5)  # Adjust row heights
+        
+        # Color code the actions
+        for i in range(len(parsing_steps)):
+            action_cell = table[(i+1, 3)]  # +1 for header row
+            action_text = str(parsing_steps[i]['action'])
+            
+            if 'shift' in action_text:
+                action_cell.set_facecolor('#d4f1f9')  # Light blue
+            elif 'reduce' in action_text:
+                action_cell.set_facecolor('#d5f5e3')  # Light green
+            elif 'ACCEPT' in action_text:
+                action_cell.set_facecolor('#fadbd8')  # Light red
+            elif 'ERROR' in action_text:
+                action_cell.set_facecolor('#f9e79f')  # Light yellow
+        
+        plt.title('LR(1) Parsing Steps', fontsize=16, pad=20)
+        plt.tight_layout()
+        
+        # Save to file if requested
+        if output_file:
+            plt.savefig(output_file, dpi=300, bbox_inches='tight')
+            print(f"Parsing steps visualization saved to {output_file}")
+        
+        # Display the visualization
+        plt.show()
+        
+    except Exception as e:
+        print(f"Error generating parsing steps visualization: {e}")
+
 def main():
     """Main function to demonstrate table visualization."""
     # This part would call your existing code to generate the parsing table

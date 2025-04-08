@@ -202,38 +202,79 @@ class Grammar:
         # This line should never be reached
         return False, steps, "Unexpected end of parsing"
 
-    def test_input(self, input_string, action_table, goto_table, verbose=False):
+    def test_input(self, input_str, action_table, goto_table, verbose=False, collect_steps=False):
         """
-        Test if an input string is part of the grammar.
+        Test if an input string is accepted by the LR(1) parser.
         
         Args:
-            input_string (str): The string to test (space-separated tokens)
-            action_table (dict): ACTION table from the parsing table
-            goto_table (dict): GOTO table from the parsing table
-            verbose (bool): Whether to print detailed parsing steps
-            
+            input_str (str): Input string to test
+            action_table (dict): ACTION table for the parser
+            goto_table (dict): GOTO table for the parser
+            verbose (bool): Whether to print parsing steps
+            collect_steps (bool): Whether to collect parsing steps for visualization
+        
         Returns:
-            bool: True if the input is valid, False otherwise
+            tuple: (is_valid, error_message, parsing_steps)
         """
-        is_valid, steps, error = self.parse_input(input_string, action_table, goto_table)
+        # Tokenize the input
+        tokens = input_str.split()
+        tokens.append('$')  # End marker
         
-        if is_valid:
-            print(f"✓ Input '{input_string}' is valid according to the grammar.")
-        else:
-            print(f"✗ Input '{input_string}' is NOT valid according to the grammar.")
-            if error:
-                print(f"  Error: {error}")
+        # Initialize stack with initial state
+        stack = [0]
+        input_index = 0
+        steps = []
         
-        if verbose:
-            print_steps = input("Do you want to print the parsing steps? (y/n): ").strip().lower() == 'y'
-            if print_steps:
-                print("\nParsing Steps:")
-                for i, step in enumerate(steps):
-                    stack_str = ' '.join(str(s) for s in step['stack'])
-                    input_str = ' '.join(step['input'])
-                    print(f"Step {i}:")
-                    print(f"  Stack: {stack_str}")
-                    print(f"  Input: {input_str}")
-                    print(f"  Action: {step['action']}")
-                    print()
-        return is_valid
+        while True:
+            state = stack[-1]
+            symbol = tokens[input_index] if input_index < len(tokens) else '$'
+            
+            # Look up action
+            action = action_table.get((state, symbol))
+            
+            # Format stack and input for display
+            stack_str = ' '.join(map(str, stack))
+            input_str = ' '.join(tokens[input_index:])
+            
+            if collect_steps:
+                steps.append({
+                    'stack': stack_str,
+                    'input': input_str,
+                    'action': action if action else "ERROR"
+                })
+            
+            if verbose:
+                print(f"Stack: {stack_str}")
+                print(f"Input: {input_str}")
+                print(f"Action: {action}")
+                print()
+            
+            # Process action
+            if action is None:
+                error_msg = f"No action defined for state {state} on symbol '{symbol}'"
+                return False, error_msg, steps
+            
+            if action[0] == 'shift':
+                stack.append(symbol)
+                stack.append(action[1])
+                input_index += 1
+            elif action[0] == 'reduce':
+                production_index = action[1]
+                lhs, rhs = self.productions[production_index]
+                
+                # Pop 2 * |rhs| items from the stack
+                for _ in range(2 * len(rhs)):
+                    stack.pop()
+                
+                # Get new state from GOTO table
+                goto_state = goto_table.get((stack[-1], lhs))
+                
+                # Push LHS and new state
+                stack.append(lhs)
+                stack.append(goto_state)
+            elif action[0] == 'accept':
+                if collect_steps:
+                    steps[-1]['action'] = "ACCEPT"
+                return True, None, steps
+                
+        return False, "Unknown error", steps

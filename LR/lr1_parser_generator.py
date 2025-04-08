@@ -16,7 +16,7 @@ from visualizer import display_parsing_table
 
 # Import the visualization function from matplot.py
 try:
-    from matplot import enhance_parsing_table_display
+    from matplot import enhance_parsing_table_display, visualize_parsing_steps
     HAS_MATPLOTLIB = True
 except ImportError:
     HAS_MATPLOTLIB = False
@@ -84,17 +84,51 @@ def main():
             enhance_parsing_table_display(action_table, goto_table, grammar, output_file)
     else:
         print("\nGraphical visualization is not available. Install matplotlib to enable this feature.")
-    # Add input testing functionality
+    
+    # Input testing functionality 
     print("\n=== Input String Testing ===")
     print("Enter strings to test (or empty to quit):")
     while True:
         test_input = input("> ").strip()
         if not test_input:
             break
-        grammar.test_input(test_input, action_table, goto_table, verbose=True)
+        
+        # Modified to capture parsing steps
+        valid, error_msg, parsing_steps = grammar.test_input(test_input, action_table, goto_table, verbose=False, collect_steps=True)
+        
+        if valid:
+            print(f"✓ Input '{test_input}' is valid according to the grammar.")
+        else:
+            print(f"✗ Input '{test_input}' is NOT valid according to the grammar.")
+            if error_msg:
+                print(f"  Error: {error_msg}")
+        
+        show_steps = input("Do you want to print the parsing steps? (y/n): ").strip().lower()
+        if show_steps == 'y':
+            print("\nParsing Steps:")
+            for i, step in enumerate(parsing_steps):
+                print(f"Step {i}:")
+                print(f"  Stack: {step['stack']}")
+                print(f"  Input: {step['input']}")
+                print(f"  Action: {step['action']}")
+                print()
+        
+        # Ask if user wants to visualize the parsing steps
+        if HAS_MATPLOTLIB and parsing_steps:
+            visualize_steps = input("Do you want to visualize the parsing steps? (y/n): ").strip().lower()
+            if visualize_steps == 'y':
+                output_file = None
+                save_option = input("Do you want to save the visualization to a file? (y/n): ").strip().lower()
+                if save_option in ['y', 'yes']:
+                    output_file = input("Enter filename (e.g., 'parsing_steps.png'): ").strip()
+                    if not output_file:
+                        output_file = f"parsing_steps_{test_input.replace(' ', '_')}.png"
+                    print(f"Visualization will be saved to {output_file}")
+                
+                print("Generating visualization of parsing steps...")
+                visualize_parsing_steps(parsing_steps, output_file)
 
 def get_grammar_input():
-    
     """Get grammar input from user in BNF-like format."""
     print("\nEnter your grammar rules, one per line.")
     print("Use the format: A -> B C | D")
